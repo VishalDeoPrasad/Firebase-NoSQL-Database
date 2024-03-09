@@ -233,7 +233,107 @@ cloudfilename=input("Enter the name of the file you want to download")
 storage.child(cloudfilename).download("", "download1.txt")
 storage.child(cloud_file_name).get_url(None)
 ```
+## Read File
+```python
+import urllib
 
+cloud_file_name = input("Enter the name of the file you wanted to read")
+try:
+    url = storage.child(cloud_file_name).get_url(None)
+    f = urllib.request.urlopen(url).read()
+    print(f)
+except:
+    print("File Not Fount! Check your input!!")
+```
 
 ## 3. Firebase real-time database: Create, Read, Update and delete it
+```python
+import pyrebase
 
+firebaseConfig = {
+  "apiKey": "AIzaSyBuhWUbRNVt651kvvS9uBl5t5FSdINxXas",
+  "authDomain": "fir-course-9afa4.firebaseapp.com",
+  "databaseURL": "https://fir-course-9afa4-default-rtdb.firebaseio.com",
+  "projectId": "fir-course-9afa4",
+  "storageBucket": "fir-course-9afa4.appspot.com",
+  "messagingSenderId": "94327026554",
+  "appId": "1:94327026554:web:9d2771939edeb475f15cc3",
+  "measurementId": "G-6W970X59R3"
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+db = firebase.database()
+```
+## 1. Create
+```python
+data = {
+    'age':40,
+    'address':"New York",
+    'employed':True,
+    'name':'John Smith'
+}
+db.push(data)
+```
+![alt text](image-43.png)
+
+```python
+data = {
+    'age':40,
+    'address':"New York",
+    'employed':True,
+    'name':'John Smith'
+}
+db.child('people').push(data)
+```
+![alt text](image-44.png)
+
+```python
+#create a custom id
+data = {
+    'age':30,
+    'address':"New Delhi",
+    'employed':False,
+    'name':'Rahul'
+}
+db.child('people').child("myownid").set(data)
+```
+![alt text](image-45.png)
+
+## 2. Read
+```python
+people = db.child("people").get()
+for person in people.each():
+    print(person.val(), person.key())
+```
+![alt text](image-47.png)
+
+### 3. Update
+```python
+# if we know the key
+db.child("people").child("myownid").update({'name':'Jane'})
+```
+```python
+#if we don't know the key
+people = db.child("people").get()
+for person in people.each():
+    if person.val()['name'] == 'Jane':
+        db.child("people").child(person.key()).update({'name':'Jimmy'})
+```
+
+### 4. Delete
+```python
+# delete the age
+db.child("people").child("myownid").child("age").remove()
+```
+```python
+# delete the entire node
+db.child("people").child("myownid").remove()
+```
+
+```python
+#if we don't know the key
+people = db.child("people").get()
+for person in people.each():
+    if person.val()['name'] == 'John Smith':
+        db.child("people").child(person.key()).child("age").remove()
+```
